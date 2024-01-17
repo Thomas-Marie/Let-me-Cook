@@ -1,0 +1,16 @@
+{
+  "name": "let-me-cook",
+  "version": "1.0.0",
+  "description": "An application that lets users search for ingredients or recipes",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "author": "Thomas Marie",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
