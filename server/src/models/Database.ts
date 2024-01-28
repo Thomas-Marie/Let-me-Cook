@@ -15,7 +15,7 @@ abstract class Database {
         password: "GpIMVocPwQYSAchVQ3Wv",
       });
 
-      console.log("Bien connecté à la base de données");
+      console.log("Database connection ✅");
       return this.dbInstance;
     } catch (error) {
       console.error("Erreur lors de la connexion à la db");
