@@ -29,7 +29,7 @@ class UserController {
       const user = await UserModel.getUserById(userId);
 
       if (!user) {
-        res.status(404).json({ error: "User not found1" });
+        res.status(404).json({ error: "User not found" });
         return;
       }
 
@@ -53,7 +53,7 @@ class UserController {
       const result = await UserModel.updateUser(updatedUser, userId);
 
       if (!result) {
-        res.status(404).json({ error: "User not found2" });
+        res.status(404).json({ error: "User not found" });
         return;
       }
 
@@ -70,7 +70,7 @@ class UserController {
       const user = await UserModel.deleteUser(userId);
 
       if (!user) {
-        res.status(404).json({ error: "User not found3" });
+        res.status(404).json({ error: "User not found" });
         return;
       }
 
