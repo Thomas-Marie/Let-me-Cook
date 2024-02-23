@@ -87,8 +87,8 @@ class FavoriteRecipe extends Database {
     const [result] = await FavoriteRecipe.connection.execute<ResultSetHeader>(
       query,
       [
-        updatedFavoriteRecipe.user_id,
         updatedFavoriteRecipe.recipe_id,
+        updatedFavoriteRecipe.user_id,
         favoriteRecipeId,
       ]
     );
