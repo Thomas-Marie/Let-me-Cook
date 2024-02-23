@@ -6,6 +6,7 @@ import ingredientRouter from "./routes/ingredientRouter";
 import unitRouter from "./routes/unitRouter";
 import quantityRouter from "./routes/quantityRouter";
 import doseRouter from "./routes/doseRouter";
+import favoriteRecipeRouter from "./routes/FavoriteRecipeRouter";
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use("/ingredient", ingredientRouter);
 app.use("/unit", unitRouter);
 app.use("/quantity", quantityRouter);
 app.use("/dose", doseRouter);
+app.use("/favoriteRecipe", favoriteRecipeRouter);
 
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);

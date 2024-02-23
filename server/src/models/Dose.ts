@@ -78,7 +78,7 @@ class Dose extends Database {
 
   static async updateDose(
     updatedDose: DoseInterface,
-    DoseId: number
+    doseId: number
   ): Promise<Dose | null> {
     if (!Dose.connection) {
       Dose.connection = await Database.getDbInstance();
@@ -93,7 +93,7 @@ class Dose extends Database {
       updatedDose.expiry_date,
       updatedDose.user_id,
       updatedDose.ingredient_id,
-      DoseId,
+      doseId,
     ]);
 
     return result;
