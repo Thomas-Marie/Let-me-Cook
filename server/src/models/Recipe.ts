@@ -13,13 +13,7 @@ class Recipe extends Database {
   static async createRecipe(
     newRecipe: RecipeInterface
   ): Promise<ResultSetHeader> {
-    if (!Recipe.connection) {
-      Recipe.connection = await Database.getDbInstance();
-      if (!Recipe.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
-
+    await Database.checkDatabaseConnection();
     const query = `INSERT INTO recipes (title, instructions) VALUES (?, ?)`;
     const [result] = await Recipe.connection.execute<ResultSetHeader>(query, [
       newRecipe.title,
@@ -30,12 +24,7 @@ class Recipe extends Database {
   }
 
   static async getRecipes(): Promise<Recipe[]> {
-    if (!Recipe.connection) {
-      Recipe.connection = await Database.getDbInstance();
-      if (!Recipe.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
+    await Database.checkDatabaseConnection();
     const query = "SELECT * FROM recipes";
     const [rows] = await this.connection.execute<RowDataPacket[]>(query);
 
@@ -49,12 +38,7 @@ class Recipe extends Database {
   }
 
   static async getRecipeById(recipeId: number): Promise<Recipe | null> {
-    if (!Recipe.connection) {
-      Recipe.connection = await Database.getDbInstance();
-      if (!Recipe.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
+    await Database.checkDatabaseConnection();
     const query = "SELECT * FROM recipes WHERE id = ?";
     const [rows] = await this.connection.execute(query, [recipeId]);
     if (Array.isArray(rows) && rows.length > 0) {
@@ -64,6 +48,7 @@ class Recipe extends Database {
         title: recipeData.title,
         instructions: recipeData.instructions,
       };
+
       return recipe;
     } else {
       return null;
@@ -74,12 +59,7 @@ class Recipe extends Database {
     updatedRecipe: RecipeInterface,
     recipeId: number
   ): Promise<Recipe | null> {
-    if (!Recipe.connection) {
-      Recipe.connection = await Database.getDbInstance();
-      if (!Recipe.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
+    await Database.checkDatabaseConnection();
     const query = "UPDATE recipes SET title = ?, instructions = ? WHERE id = ?";
     const [result] = await Recipe.connection.execute<ResultSetHeader>(query, [
       updatedRecipe.title,
@@ -91,15 +71,10 @@ class Recipe extends Database {
   }
 
   static async deleteRecipe(recipeId: number): Promise<Recipe | null> {
-    if (!Recipe.connection) {
-      Recipe.connection = await Database.getDbInstance();
-      if (!Recipe.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
-
+    await Database.checkDatabaseConnection();
     const query = "DELETE FROM recipes WHERE id = ?";
     const result = await Recipe.connection.execute(query, [recipeId]);
+
     return result;
   }
 }

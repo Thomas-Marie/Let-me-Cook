@@ -9,13 +9,7 @@ class Unit extends Database {
   static connection: Connection;
 
   static async createUnit(newUnit: UnitInterface): Promise<ResultSetHeader> {
-    if (!Unit.connection) {
-      Unit.connection = await Database.getDbInstance();
-      if (!Unit.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
-
+    await Database.checkDatabaseConnection();
     const query = `INSERT INTO units (name) VALUES (?)`;
     const [result] = await Unit.connection.execute<ResultSetHeader>(query, [
       newUnit.name,
@@ -25,12 +19,7 @@ class Unit extends Database {
   }
 
   static async getUnits(): Promise<Unit[]> {
-    if (!Unit.connection) {
-      Unit.connection = await Database.getDbInstance();
-      if (!Unit.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
+    await Database.checkDatabaseConnection();
     const query = "SELECT * FROM units";
     const [rows] = await this.connection.execute<RowDataPacket[]>(query);
 
@@ -43,12 +32,7 @@ class Unit extends Database {
   }
 
   static async getUnitById(unitId: number): Promise<Unit | null> {
-    if (!Unit.connection) {
-      Unit.connection = await Database.getDbInstance();
-      if (!Unit.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
+    await Database.checkDatabaseConnection();
     const query = "SELECT * FROM units WHERE id = ?";
     const [rows] = await this.connection.execute(query, [unitId]);
     if (Array.isArray(rows) && rows.length > 0) {
@@ -57,6 +41,7 @@ class Unit extends Database {
         id: unitData.id,
         Unitname: unitData.name,
       };
+
       return unit;
     } else {
       return null;
@@ -67,12 +52,7 @@ class Unit extends Database {
     updatedUnit: UnitInterface,
     unitId: number
   ): Promise<Unit | null> {
-    if (!Unit.connection) {
-      Unit.connection = await Database.getDbInstance();
-      if (!Unit.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
+    await Database.checkDatabaseConnection();
     const query = "UPDATE units SET name = ? WHERE id = ?";
     const [result] = await Unit.connection.execute<ResultSetHeader>(query, [
       updatedUnit.name,
@@ -83,15 +63,10 @@ class Unit extends Database {
   }
 
   static async deleteUnit(unitId: number): Promise<Unit | null> {
-    if (!Unit.connection) {
-      Unit.connection = await Database.getDbInstance();
-      if (!Unit.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
-
+    await Database.checkDatabaseConnection();
     const query = "DELETE FROM units WHERE id = ?";
     const result = await Unit.connection.execute(query, [unitId]);
+
     return result;
   }
 }

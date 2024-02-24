@@ -13,13 +13,7 @@ class Dose extends Database {
   static connection: Connection;
 
   static async createDose(newDose: DoseInterface): Promise<ResultSetHeader> {
-    if (!Dose.connection) {
-      Dose.connection = await Database.getDbInstance();
-      if (!Dose.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
-
+    await Database.checkDatabaseConnection();
     const query = `INSERT INTO doses (quantity, expiry_date, user_id, ingredient_id) VALUES (?, ?, ?, ?)`;
     const [result] = await Dose.connection.execute<ResultSetHeader>(query, [
       newDose.quantity,
@@ -32,12 +26,7 @@ class Dose extends Database {
   }
 
   static async getDoses(): Promise<Dose[]> {
-    if (!Dose.connection) {
-      Dose.connection = await Database.getDbInstance();
-      if (!Dose.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
+    await Database.checkDatabaseConnection();
     const query = "SELECT * FROM doses";
     const [rows] = await this.connection.execute<RowDataPacket[]>(query);
 
@@ -53,12 +42,7 @@ class Dose extends Database {
   }
 
   static async getDoseById(doseId: number): Promise<Dose | null> {
-    if (!Dose.connection) {
-      Dose.connection = await Database.getDbInstance();
-      if (!Dose.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
+    await Database.checkDatabaseConnection();
     const query = "SELECT * FROM doses WHERE id = ?";
     const [rows] = await this.connection.execute(query, [doseId]);
     if (Array.isArray(rows) && rows.length > 0) {
@@ -70,6 +54,7 @@ class Dose extends Database {
         user_id: doseData.user_id,
         ingredient_id: doseData.ingredient_id,
       };
+
       return dose;
     } else {
       return null;
@@ -80,12 +65,7 @@ class Dose extends Database {
     updatedDose: DoseInterface,
     doseId: number
   ): Promise<Dose | null> {
-    if (!Dose.connection) {
-      Dose.connection = await Database.getDbInstance();
-      if (!Dose.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
+    await Database.checkDatabaseConnection();
     const query =
       "UPDATE doses SET quantity = ?, expiry_date = ?, user_id = ?, ingredient_id = ? WHERE id = ?";
     const [result] = await Dose.connection.execute<ResultSetHeader>(query, [
@@ -100,15 +80,10 @@ class Dose extends Database {
   }
 
   static async deleteDose(doseId: number): Promise<Dose | null> {
-    if (!Dose.connection) {
-      Dose.connection = await Database.getDbInstance();
-      if (!Dose.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
-
+    await Database.checkDatabaseConnection();
     const query = "DELETE FROM doses WHERE id = ?";
     const result = await Dose.connection.execute(query, [doseId]);
+
     return result;
   }
 }

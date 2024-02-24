@@ -13,13 +13,7 @@ class FavoriteIngredient extends Database {
   static async createFavoriteIngredient(
     newFavoriteIngredient: FavoriteIngredientInterface
   ): Promise<ResultSetHeader> {
-    if (!FavoriteIngredient.connection) {
-      FavoriteIngredient.connection = await Database.getDbInstance();
-      if (!FavoriteIngredient.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
-
+    await Database.checkDatabaseConnection();
     const query = `INSERT INTO ingredients_users (ingredient_id, user_id) VALUES (?, ?)`;
     const [result] =
       await FavoriteIngredient.connection.execute<ResultSetHeader>(query, [
@@ -31,12 +25,7 @@ class FavoriteIngredient extends Database {
   }
 
   static async getFavoriteIngredients(): Promise<FavoriteIngredient[]> {
-    if (!FavoriteIngredient.connection) {
-      FavoriteIngredient.connection = await Database.getDbInstance();
-      if (!FavoriteIngredient.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
+    await Database.checkDatabaseConnection();
     const query = "SELECT * FROM ingredients_users";
     const [rows] = await this.connection.execute<RowDataPacket[]>(query);
 
@@ -52,12 +41,7 @@ class FavoriteIngredient extends Database {
   static async getFavoriteIngredientById(
     favoriteIngredientId: number
   ): Promise<FavoriteIngredient | null> {
-    if (!FavoriteIngredient.connection) {
-      FavoriteIngredient.connection = await Database.getDbInstance();
-      if (!FavoriteIngredient.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
+    await Database.checkDatabaseConnection();
     const query = "SELECT * FROM ingredients_users WHERE id = ?";
     const [rows] = await this.connection.execute(query, [favoriteIngredientId]);
     if (Array.isArray(rows) && rows.length > 0) {
@@ -67,6 +51,7 @@ class FavoriteIngredient extends Database {
         ingredient_id: favoriteIngredientData.ingredient_id,
         user_id: favoriteIngredientData.user_id,
       };
+
       return favoriteIngredient;
     } else {
       return null;
@@ -77,12 +62,7 @@ class FavoriteIngredient extends Database {
     updatedFavoriteIngredient: FavoriteIngredientInterface,
     favoriteIngredientId: number
   ): Promise<FavoriteIngredient | null> {
-    if (!FavoriteIngredient.connection) {
-      FavoriteIngredient.connection = await Database.getDbInstance();
-      if (!FavoriteIngredient.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
+    await Database.checkDatabaseConnection();
     const query =
       "UPDATE ingredients_users SET ingredient_id = ?, user_id = ? WHERE id = ?";
     const [result] =
@@ -98,17 +78,12 @@ class FavoriteIngredient extends Database {
   static async deleteFavoriteIngredient(
     favoriteIngredientId: number
   ): Promise<FavoriteIngredient | null> {
-    if (!FavoriteIngredient.connection) {
-      FavoriteIngredient.connection = await Database.getDbInstance();
-      if (!FavoriteIngredient.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
-
+    await Database.checkDatabaseConnection();
     const query = "DELETE FROM ingredients_users WHERE id = ?";
     const result = await FavoriteIngredient.connection.execute(query, [
       favoriteIngredientId,
     ]);
+
     return result;
   }
 }

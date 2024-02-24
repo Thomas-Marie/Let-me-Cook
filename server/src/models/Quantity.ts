@@ -14,13 +14,7 @@ class Quantity extends Database {
   static async createQuantity(
     newQuantity: QuantityInterface
   ): Promise<ResultSetHeader> {
-    if (!Quantity.connection) {
-      Quantity.connection = await Database.getDbInstance();
-      if (!Quantity.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
-
+    await Database.checkDatabaseConnection();
     const query = `INSERT INTO quantities (dose, recipe_id, ingredient_id) VALUES (?, ?, ?)`;
     const [result] = await Quantity.connection.execute<ResultSetHeader>(query, [
       newQuantity.dose,
@@ -32,12 +26,7 @@ class Quantity extends Database {
   }
 
   static async getQuantities(): Promise<Quantity[]> {
-    if (!Quantity.connection) {
-      Quantity.connection = await Database.getDbInstance();
-      if (!Quantity.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
+    await Database.checkDatabaseConnection();
     const query = "SELECT * FROM quantities";
     const [rows] = await this.connection.execute<RowDataPacket[]>(query);
 
@@ -52,12 +41,7 @@ class Quantity extends Database {
   }
 
   static async getQuantityById(quantityId: number): Promise<Quantity | null> {
-    if (!Quantity.connection) {
-      Quantity.connection = await Database.getDbInstance();
-      if (!Quantity.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
+    await Database.checkDatabaseConnection();
     const query = "SELECT * FROM quantities WHERE id = ?";
     const [rows] = await this.connection.execute(query, [quantityId]);
     if (Array.isArray(rows) && rows.length > 0) {
@@ -68,6 +52,7 @@ class Quantity extends Database {
         recipe_id: quantityData.recipe_id,
         ingredient_id: quantityData.ingredient_id,
       };
+
       return quantity;
     } else {
       return null;
@@ -78,12 +63,7 @@ class Quantity extends Database {
     updatedQuantity: QuantityInterface,
     quantityId: number
   ): Promise<Quantity | null> {
-    if (!Quantity.connection) {
-      Quantity.connection = await Database.getDbInstance();
-      if (!Quantity.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
+    await Database.checkDatabaseConnection();
     const query =
       "UPDATE quantities SET dose = ?, recipe_id = ?, ingredient_id = ? WHERE id = ?";
     const [result] = await Quantity.connection.execute<ResultSetHeader>(query, [
@@ -97,15 +77,10 @@ class Quantity extends Database {
   }
 
   static async deleteQuantity(quantityId: number): Promise<Quantity | null> {
-    if (!Quantity.connection) {
-      Quantity.connection = await Database.getDbInstance();
-      if (!Quantity.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
-
+    await Database.checkDatabaseConnection();
     const query = "DELETE FROM quantities WHERE id = ?";
     const result = await Quantity.connection.execute(query, [quantityId]);
+
     return result;
   }
 }
