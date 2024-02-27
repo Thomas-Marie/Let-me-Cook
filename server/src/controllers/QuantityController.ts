@@ -25,7 +25,7 @@ class QuantityController {
 
   async getQuantityById(req: Request, res: Response): Promise<void> {
     try {
-      const quantityId = parseInt(req.params.id, 10);
+      const quantityId = parseInt(req.params.id);
       const quantity = await QuantityModel.getQuantityById(quantityId);
 
       if (!quantity) {
@@ -42,13 +42,15 @@ class QuantityController {
 
   async updateQuantity(req: Request, res: Response): Promise<void> {
     try {
-      const quantityId = parseInt(req.params.id, 10);
-      const updatedQuantity = req.body;
-
-      if (!updatedQuantity) {
-        res.status(400).json({ error: "Invalid request body" });
-        return;
+      const quantityId = parseInt(req.params.id);
+      const currentQuantity = await QuantityModel.getQuantityById(quantityId);
+      if (!currentQuantity) {
+        res.status(404).json({ error: "Current quantity not found" });
       }
+      const updatedQuantity = {
+        ...currentQuantity,
+        ...req.body,
+      };
 
       const result = await QuantityModel.updateQuantity(
         updatedQuantity,
@@ -69,7 +71,7 @@ class QuantityController {
 
   async deleteQuantity(req: Request, res: Response): Promise<void> {
     try {
-      const quantityId = parseInt(req.params.id, 10);
+      const quantityId = parseInt(req.params.id);
       const quantity = await QuantityModel.deleteQuantity(quantityId);
 
       if (!quantity) {

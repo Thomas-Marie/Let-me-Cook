@@ -25,7 +25,7 @@ class RecipeController {
 
   async getRecipeById(req: Request, res: Response): Promise<void> {
     try {
-      const recipeId = parseInt(req.params.id, 10);
+      const recipeId = parseInt(req.params.id);
       const recipe = await RecipeModel.getRecipeById(recipeId);
 
       if (!recipe) {
@@ -42,13 +42,16 @@ class RecipeController {
 
   async updateRecipe(req: Request, res: Response): Promise<void> {
     try {
-      const recipeId = parseInt(req.params.id, 10);
-      const updatedRecipe = req.body;
-
-      if (!updatedRecipe) {
-        res.status(400).json({ error: "Invalid request body" });
+      const recipeId = parseInt(req.params.id);
+      const currentRecipe = await RecipeModel.getRecipeById(recipeId);
+      if (!currentRecipe) {
+        res.status(404).json({ error: "Current recipe not found" });
         return;
       }
+      const updatedRecipe = {
+        ...currentRecipe,
+        ...req.body,
+      };
       const result = await RecipeModel.updateRecipe(updatedRecipe, recipeId);
 
       if (!result) {
@@ -65,7 +68,7 @@ class RecipeController {
 
   async deleteRecipe(req: Request, res: Response): Promise<void> {
     try {
-      const recipeId = parseInt(req.params.id, 10);
+      const recipeId = parseInt(req.params.id);
       const recipe = await RecipeModel.deleteRecipe(recipeId);
 
       if (!recipe) {

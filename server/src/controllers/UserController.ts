@@ -25,7 +25,7 @@ class UserController {
 
   async getUserById(req: Request, res: Response): Promise<void> {
     try {
-      const userId = parseInt(req.params.id, 10);
+      const userId = parseInt(req.params.id);
       const user = await UserModel.getUserById(userId);
 
       if (!user) {
@@ -42,13 +42,15 @@ class UserController {
 
   async updateUser(req: Request, res: Response): Promise<void> {
     try {
-      const userId = parseInt(req.params.id, 10);
-      const updatedUser = req.body;
-
-      if (!updatedUser) {
-        res.status(400).json({ error: "Invalid request body" });
-        return;
+      const userId = parseInt(req.params.id);
+      const currentUser = await UserModel.getUserById(userId);
+      if (!currentUser) {
+        res.status(404).json({ error: "Current user not found" });
       }
+      const updatedUser = {
+        ...currentUser,
+        ...req.body,
+      };
 
       const result = await UserModel.updateUser(updatedUser, userId);
 
@@ -66,7 +68,7 @@ class UserController {
 
   async deleteUser(req: Request, res: Response): Promise<void> {
     try {
-      const userId = parseInt(req.params.id, 10);
+      const userId = parseInt(req.params.id);
       const user = await UserModel.deleteUser(userId);
 
       if (!user) {

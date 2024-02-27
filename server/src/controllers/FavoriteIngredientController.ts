@@ -31,7 +31,7 @@ class FavoriteIngredientController {
 
   async getFavoriteIngredientById(req: Request, res: Response): Promise<void> {
     try {
-      const favoriteIngredientId = parseInt(req.params.id, 10);
+      const favoriteIngredientId = parseInt(req.params.id);
       const favoriteIngredient =
         await FavoriteIngredientModel.getFavoriteIngredientById(
           favoriteIngredientId
@@ -51,13 +51,18 @@ class FavoriteIngredientController {
 
   async updateFavoriteIngredient(req: Request, res: Response): Promise<void> {
     try {
-      const favoriteIngredientId = parseInt(req.params.id, 10);
-      const updatedFavoriteIngredient = req.body;
-
-      if (!updatedFavoriteIngredient) {
-        res.status(400).json({ error: "Invalid request body" });
-        return;
+      const favoriteIngredientId = parseInt(req.params.id);
+      const currentFavoriteIngredient =
+        await FavoriteIngredientModel.getFavoriteIngredientById(
+          favoriteIngredientId
+        );
+      if (!currentFavoriteIngredient) {
+        res.status(404).json({ error: "Current favoriteIngredient not found" });
       }
+      const updatedFavoriteIngredient = {
+        ...currentFavoriteIngredient,
+        ...req.body,
+      };
 
       const result = await FavoriteIngredientModel.updateFavoriteIngredient(
         updatedFavoriteIngredient,
@@ -80,7 +85,7 @@ class FavoriteIngredientController {
 
   async deleteFavoriteIngredient(req: Request, res: Response): Promise<void> {
     try {
-      const favoriteIngredientId = parseInt(req.params.id, 10);
+      const favoriteIngredientId = parseInt(req.params.id);
       const favoriteIngredient =
         await FavoriteIngredientModel.deleteFavoriteIngredient(
           favoriteIngredientId
