@@ -23,7 +23,7 @@ class Recipe extends Database {
     return result;
   }
 
-  static async getRecipes(): Promise<Recipe[]> {
+  static async getRecipes(): Promise<RecipeInterface[]> {
     await Database.checkDatabaseConnection();
     const query = "SELECT * FROM recipes";
     const [rows] = await this.connection.execute<RowDataPacket[]>(query);
@@ -35,6 +35,61 @@ class Recipe extends Database {
           instructions: row.instructions,
         }))
       : [];
+  }
+
+  static async getIngredientIdsByRecipeId(recipeId: number): Promise<number[]> {
+    try {
+      await Database.checkDatabaseConnection();
+
+      const query = "SELECT ingredient_id FROM quantities WHERE recipe_id = ?";
+      const [rows] = await this.connection.execute<RowDataPacket[]>(query, [
+        recipeId,
+      ]);
+      const ingredientIds: number[] = rows.map((row) => row.ingredient_id);
+
+      return ingredientIds;
+    } catch (error) {
+      throw new Error("Error retrieving ingredient IDs by recipe ID: " + error);
+    }
+  }
+
+  /*
+  une recette est retournée SEULEMENT SI tous les ingrédients associés à la recette sont sélectionnés 
+  sinon ça retourne un array vide
+  */
+  static async getRecipesByIngredients(
+    ingredientIds: number[]
+  ): Promise<RecipeInterface[]> {
+    try {
+      await Database.checkDatabaseConnection();
+      const allRecipes: RecipeInterface[] = await Recipe.getRecipes();
+      const validRecipes: RecipeInterface[] = [];
+
+      for (const recipe of allRecipes) {
+        const associatedIngredients = await Recipe.getIngredientIdsByRecipeId(
+          recipe.id
+        );
+        const allSelectedIngredientsIncluded = ingredientIds.every(
+          (selectedIngredientId) =>
+            associatedIngredients.includes(selectedIngredientId)
+        );
+        const allAssociatedIngredientsIncluded = associatedIngredients.every(
+          (associatedIngredientId) =>
+            ingredientIds.includes(associatedIngredientId)
+        );
+
+        if (
+          allSelectedIngredientsIncluded &&
+          allAssociatedIngredientsIncluded
+        ) {
+          validRecipes.push(recipe);
+        }
+      }
+
+      return validRecipes;
+    } catch (error) {
+      throw new Error("Error retrieving recipes by ingredients: " + error);
+    }
   }
 
   static async getRecipeById(recipeId: number): Promise<Recipe | null> {

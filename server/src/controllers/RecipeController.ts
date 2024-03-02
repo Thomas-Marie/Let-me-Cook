@@ -23,16 +23,49 @@ class RecipeController {
     }
   }
 
+  async getIngredientIdsByRecipeId(req: Request, res: Response): Promise<void> {
+    try {
+      const recipeId: number = parseInt(req.params.recipeId);
+      if (isNaN(recipeId)) {
+        res.status(400).json({ error: "Invalid recipe ID provided" });
+        return;
+      }
+      const ingredientIds = await RecipeModel.getIngredientIdsByRecipeId(
+        recipeId
+      );
+      res.status(200).json(ingredientIds);
+    } catch (error) {
+      console.error("Error retrieving ingredient IDs by recipe ID:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+
+  async getRecipesByIngredients(req: Request, res: Response): Promise<void> {
+    try {
+      if (!req.query.ingredientIds) {
+        res.status(400).json({ error: "No ingredient IDs provided" });
+        return;
+      }
+      const ingredientIds: number[] = Array.isArray(req.query.ingredientIds)
+        ? (req.query.ingredientIds as string[]).map((id) => parseInt(id))
+        : [parseInt(req.query.ingredientIds as string)];
+
+      const recipes = await RecipeModel.getRecipesByIngredients(ingredientIds);
+      res.status(200).json(recipes);
+    } catch (error) {
+      console.error("Error when retrieving recipes by ingredients:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+
   async getRecipeById(req: Request, res: Response): Promise<void> {
     try {
       const recipeId = parseInt(req.params.id);
       const recipe = await RecipeModel.getRecipeById(recipeId);
-
       if (!recipe) {
         res.status(404).json({ error: "Recipe not found" });
         return;
       }
-
       res.status(200).json(recipe);
     } catch (error) {
       console.error("Error when retrieving recipe:", error);
@@ -53,12 +86,10 @@ class RecipeController {
         ...req.body,
       };
       const result = await RecipeModel.updateRecipe(updatedRecipe, recipeId);
-
       if (!result) {
         res.status(404).json({ error: "Recipe not found" });
         return;
       }
-
       res.status(200).json({ message: "Recipe updated successfully" });
     } catch (error) {
       console.error("Error when updating a recipe:", error);
@@ -70,12 +101,10 @@ class RecipeController {
     try {
       const recipeId = parseInt(req.params.id);
       const recipe = await RecipeModel.deleteRecipe(recipeId);
-
       if (!recipe) {
         res.status(404).json({ error: "Recipe not found" });
         return;
       }
-
       res.status(200).json({ message: "Recipe deleted successfully" });
     } catch (error) {
       console.error("Error when deleting a recipe:", error);

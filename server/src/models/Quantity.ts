@@ -40,6 +40,23 @@ class Quantity extends Database {
       : [];
   }
 
+  static async getQuantitiesByRecipeId(recipeId: number): Promise<Quantity[]> {
+    await Database.checkDatabaseConnection();
+    const query = "SELECT * FROM quantities WHERE recipe_id = ?";
+    const [rows] = await this.connection.execute<RowDataPacket[]>(query, [
+      recipeId,
+    ]);
+
+    return Array.isArray(rows)
+      ? rows.map((row) => ({
+          id: row.id,
+          recipe_id: row.recipe_id,
+          ingredient_id: row.ingredient_id,
+          quantity: row.quantity,
+        }))
+      : [];
+  }
+
   static async getQuantityById(quantityId: number): Promise<Quantity | null> {
     await Database.checkDatabaseConnection();
     const query = "SELECT * FROM quantities WHERE id = ?";
@@ -76,7 +93,7 @@ class Quantity extends Database {
     return result;
   }
 
-  static async deleteQuantity(quantityId: number): Promise<Quantity | null> {
+  static async deleteQuantity(quantityId: number): Promise<Quantity> {
     await Database.checkDatabaseConnection();
     const query = "DELETE FROM quantities WHERE id = ?";
     const result = await Quantity.connection.execute(query, [quantityId]);
