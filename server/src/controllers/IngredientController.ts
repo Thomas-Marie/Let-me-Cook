@@ -25,7 +25,7 @@ class IngredientController {
 
   async getIngredientsById(req: Request, res: Response): Promise<void> {
     try {
-      const ingredientId = parseInt(req.params.id, 10);
+      const ingredientId = parseInt(req.params.id);
       const ingredient = await IngredientModel.getIngredientById(ingredientId);
 
       if (!ingredient) {
@@ -41,13 +41,17 @@ class IngredientController {
 
   async updateIngredient(req: Request, res: Response): Promise<void> {
     try {
-      const ingredientId = parseInt(req.params.id, 10);
-      const updatedIngredient = req.body;
-
-      if (!updatedIngredient) {
-        res.status(400).json({ error: "Invalid request body" });
-        return;
+      const ingredientId = parseInt(req.params.id);
+      const currentIngredient = await IngredientModel.getIngredientById(
+        ingredientId
+      );
+      if (!currentIngredient) {
+        res.status(404).json({ error: "Current ingredient not found" });
       }
+      const updatedIngredient = {
+        ...currentIngredient,
+        ...req.body,
+      };
 
       const result = await IngredientModel.updateIngredient(
         updatedIngredient,
@@ -68,7 +72,7 @@ class IngredientController {
 
   async deleteIngredient(req: Request, res: Response): Promise<void> {
     try {
-      const ingredientId = parseInt(req.params.id, 10);
+      const ingredientId = parseInt(req.params.id);
       const ingredient = await IngredientModel.deleteIngredient(ingredientId);
 
       if (!ingredient) {

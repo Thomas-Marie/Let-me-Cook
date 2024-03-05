@@ -25,7 +25,7 @@ class DoseController {
 
   async getDoseById(req: Request, res: Response): Promise<void> {
     try {
-      const doseId = parseInt(req.params.id, 10);
+      const doseId = parseInt(req.params.id);
       const dose = await DoseModel.getDoseById(doseId);
 
       if (!dose) {
@@ -42,13 +42,15 @@ class DoseController {
 
   async updateDose(req: Request, res: Response): Promise<void> {
     try {
-      const doseId = parseInt(req.params.id, 10);
-      const updatedDose = req.body;
-
-      if (!updatedDose) {
-        res.status(400).json({ error: "Invalid request body" });
-        return;
+      const doseId = parseInt(req.params.id);
+      const currentDose = await DoseModel.getDoseById(doseId);
+      if (!currentDose) {
+        res.status(404).json({ error: "Current dose not found" });
       }
+      const updatedDose = {
+        ...currentDose,
+        ...req.body,
+      };
 
       const result = await DoseModel.updateDose(updatedDose, doseId);
 
@@ -66,7 +68,7 @@ class DoseController {
 
   async deleteDose(req: Request, res: Response): Promise<void> {
     try {
-      const doseId = parseInt(req.params.id, 10);
+      const doseId = parseInt(req.params.id);
       const dose = await DoseModel.deleteDose(doseId);
 
       if (!dose) {

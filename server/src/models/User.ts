@@ -12,13 +12,7 @@ class User extends Database {
   static connection: Connection;
 
   static async createUser(newUser: UserInterface): Promise<ResultSetHeader> {
-    if (!User.connection) {
-      User.connection = await Database.getDbInstance();
-      if (!User.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
-
+    await Database.checkDatabaseConnection();
     const query = `INSERT INTO users (username, email, password) VALUES (?, ?, ?)`;
     const [result] = await User.connection.execute<ResultSetHeader>(query, [
       newUser.username,
@@ -30,12 +24,7 @@ class User extends Database {
   }
 
   static async getUsers(): Promise<User[]> {
-    if (!User.connection) {
-      User.connection = await Database.getDbInstance();
-      if (!User.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
+    await Database.checkDatabaseConnection();
     const query = "SELECT * FROM users";
     const [rows] = await this.connection.execute<RowDataPacket[]>(query);
 
@@ -50,12 +39,7 @@ class User extends Database {
   }
 
   static async getUserById(userId: number): Promise<User | null> {
-    if (!User.connection) {
-      User.connection = await Database.getDbInstance();
-      if (!User.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
+    await Database.checkDatabaseConnection();
     const query = "SELECT * FROM users WHERE id = ?";
     const [rows] = await this.connection.execute(query, [userId]);
     if (Array.isArray(rows) && rows.length > 0) {
@@ -66,6 +50,7 @@ class User extends Database {
         email: userData.email,
         password: userData.password,
       };
+
       return user;
     } else {
       return null;
@@ -76,12 +61,7 @@ class User extends Database {
     updatedUser: UserInterface,
     userId: number
   ): Promise<User | null> {
-    if (!User.connection) {
-      User.connection = await Database.getDbInstance();
-      if (!User.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
+    await Database.checkDatabaseConnection();
     const query =
       "UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?";
     const [result] = await User.connection.execute<ResultSetHeader>(query, [
@@ -95,15 +75,10 @@ class User extends Database {
   }
 
   static async deleteUser(userId: number): Promise<User | null> {
-    if (!User.connection) {
-      User.connection = await Database.getDbInstance();
-      if (!User.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
-
+    await Database.checkDatabaseConnection();
     const query = "DELETE FROM users WHERE id = ?";
     const result = await User.connection.execute(query, [userId]);
+
     return result;
   }
 }

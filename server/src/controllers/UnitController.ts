@@ -25,7 +25,7 @@ class UnitController {
 
   async getUnitById(req: Request, res: Response): Promise<void> {
     try {
-      const unitId = parseInt(req.params.id, 10);
+      const unitId = parseInt(req.params.id);
       const unit = await UnitModel.getUnitById(unitId);
 
       if (!unit) {
@@ -42,13 +42,15 @@ class UnitController {
 
   async updateUnit(req: Request, res: Response): Promise<void> {
     try {
-      const unitId = parseInt(req.params.id, 10);
-      const updatedUnit = req.body;
-
-      if (!updatedUnit) {
-        res.status(400).json({ error: "Invalid request body" });
-        return;
+      const unitId = parseInt(req.params.id);
+      const currentUnit = await UnitModel.getUnitById(unitId);
+      if (!currentUnit) {
+        res.status(404).json({ error: "Current unit not found" });
       }
+      const updatedUnit = {
+        ...currentUnit,
+        ...req.body,
+      };
 
       const result = await UnitModel.updateUnit(updatedUnit, unitId);
 
@@ -66,7 +68,7 @@ class UnitController {
 
   async deleteUnit(req: Request, res: Response): Promise<void> {
     try {
-      const unitId = parseInt(req.params.id, 10);
+      const unitId = parseInt(req.params.id);
       const unit = await UnitModel.deleteUnit(unitId);
 
       if (!unit) {

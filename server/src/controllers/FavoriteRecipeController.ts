@@ -29,7 +29,7 @@ class FavoriteRecipeController {
 
   async getFavoriteRecipeById(req: Request, res: Response): Promise<void> {
     try {
-      const favoriteRecipeId = parseInt(req.params.id, 10);
+      const favoriteRecipeId = parseInt(req.params.id);
       const favoriteRecipe = await FavoriteRecipeModel.getFavoriteRecipeById(
         favoriteRecipeId
       );
@@ -48,13 +48,16 @@ class FavoriteRecipeController {
 
   async updateFavoriteRecipe(req: Request, res: Response): Promise<void> {
     try {
-      const favoriteRecipeId = parseInt(req.params.id, 10);
-      const updatedFavoriteRecipe = req.body;
-
-      if (!updatedFavoriteRecipe) {
-        res.status(400).json({ error: "Invalid request body" });
-        return;
+      const favoriteRecipeId = parseInt(req.params.id);
+      const currentFavoriteRecipe =
+        await FavoriteRecipeModel.getFavoriteRecipeById(favoriteRecipeId);
+      if (!currentFavoriteRecipe) {
+        res.status(404).json({ error: "Current favorite recipe not found" });
       }
+      const updatedFavoriteRecipe = {
+        ...currentFavoriteRecipe,
+        ...req.body,
+      };
 
       const result = await FavoriteRecipeModel.updateFavoriteRecipe(
         updatedFavoriteRecipe,
@@ -75,7 +78,7 @@ class FavoriteRecipeController {
 
   async deleteFavoriteRecipe(req: Request, res: Response): Promise<void> {
     try {
-      const favoriteRecipeId = parseInt(req.params.id, 10);
+      const favoriteRecipeId = parseInt(req.params.id);
       const favoriteRecipe = await FavoriteRecipeModel.deleteFavoriteRecipe(
         favoriteRecipeId
       );

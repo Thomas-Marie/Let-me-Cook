@@ -5,6 +5,13 @@ const recipeRouter = express.Router();
 
 recipeRouter.post("/", (req, res) => RecipeController.createRecipe(req, res));
 recipeRouter.get("/", (req, res) => RecipeController.getRecipes(res));
+recipeRouter.get(
+  "/:recipeId/getIngredientIds",
+  RecipeController.getIngredientIdsByRecipeId
+);
+recipeRouter.get("/by-ingredients", (req, res) =>
+  RecipeController.getRecipesByIngredients(req, res)
+);
 recipeRouter.get("/:id", (req, res) =>
   RecipeController.getRecipeById(req, res)
 );

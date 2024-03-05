@@ -13,28 +13,18 @@ class Ingredient extends Database {
   static async createIngredient(
     newIngredient: IngredientInterface
   ): Promise<ResultSetHeader> {
-    if (!Ingredient.connection) {
-      Ingredient.connection = await Database.getDbInstance();
-      if (!Ingredient.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
-
+    await Database.checkDatabaseConnection();
     const query = `INSERT INTO ingredients (name, season) VALUES (?, ?)`;
     const [result] = await Ingredient.connection.execute<ResultSetHeader>(
       query,
       [newIngredient.name, newIngredient.season]
     );
+
     return result;
   }
 
   static async getIngredients(): Promise<Ingredient[]> {
-    if (!Ingredient.connection) {
-      Ingredient.connection = await Database.getDbInstance();
-      if (!Ingredient.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
+    await Database.checkDatabaseConnection();
     const query = "SELECT * FROM ingredients";
     const [rows] = await this.connection.execute<RowDataPacket[]>(query);
 
@@ -50,12 +40,7 @@ class Ingredient extends Database {
   static async getIngredientById(
     ingredientId: number
   ): Promise<Ingredient | null> {
-    if (!Ingredient.connection) {
-      Ingredient.connection = await Database.getDbInstance();
-      if (!Ingredient.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
+    await Database.checkDatabaseConnection();
     const query = "SELECT * FROM ingredients WHERE id = ?";
     const [rows] = await this.connection.execute(query, [ingredientId]);
     if (Array.isArray(rows) && rows.length > 0) {
@@ -65,6 +50,7 @@ class Ingredient extends Database {
         name: ingredientData.name,
         season: ingredientData.season,
       };
+
       return ingredient;
     } else {
       return null;
@@ -75,12 +61,7 @@ class Ingredient extends Database {
     updatedIngredient: IngredientInterface,
     ingredientId: number
   ): Promise<Ingredient | null> {
-    if (!Ingredient.connection) {
-      Ingredient.connection = await Database.getDbInstance();
-      if (!Ingredient.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
+    await Database.checkDatabaseConnection();
     const query = "UPDATE ingredients SET name = ?, season = ? WHERE id = ?";
     const [result] = await Ingredient.connection.execute<ResultSetHeader>(
       query,
@@ -93,15 +74,10 @@ class Ingredient extends Database {
   static async deleteIngredient(
     ingredientId: number
   ): Promise<Ingredient | null> {
-    if (!Ingredient.connection) {
-      Ingredient.connection = await Database.getDbInstance();
-      if (!Ingredient.connection) {
-        throw new Error("connection not initialised");
-      }
-    }
-
+    await Database.checkDatabaseConnection();
     const query = "DELETE FROM ingredients WHERE id = ?";
     const result = await Ingredient.connection.execute(query, [ingredientId]);
+
     return result;
   }
 }

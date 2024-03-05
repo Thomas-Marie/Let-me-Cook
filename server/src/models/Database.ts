@@ -2,6 +2,7 @@ import mysql, { Connection, createConnection } from "mysql2/promise";
 
 abstract class Database {
   protected static dbInstance: Connection;
+  static connection: Connection;
 
   public static async getDbInstance(): Promise<Connection> {
     if (this.dbInstance) {
@@ -30,6 +31,15 @@ abstract class Database {
       return row;
     } catch (error) {
       throw error;
+    }
+  }
+
+  static async checkDatabaseConnection() {
+    if (!Database.connection) {
+      Database.connection = await Database.getDbInstance();
+      if (!Database.connection) {
+        throw new Error("connection not initialised");
+      }
     }
   }
 }
