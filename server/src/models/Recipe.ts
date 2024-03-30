@@ -5,6 +5,7 @@ export interface RecipeInterface {
   id: number;
   title: string;
   instructions: string;
+  picture: string;
 }
 
 class Recipe extends Database {
@@ -14,10 +15,11 @@ class Recipe extends Database {
     newRecipe: RecipeInterface
   ): Promise<ResultSetHeader> {
     await Database.checkDatabaseConnection();
-    const query = `INSERT INTO recipes (title, instructions) VALUES (?, ?)`;
+    const query = `INSERT INTO recipes (title, instructions, picture) VALUES (?, ?, ?)`;
     const [result] = await Recipe.connection.execute<ResultSetHeader>(query, [
       newRecipe.title,
       newRecipe.instructions,
+      newRecipe.picture,
     ]);
 
     return result;
@@ -33,6 +35,7 @@ class Recipe extends Database {
           id: row.id,
           title: row.title,
           instructions: row.instructions,
+          picture: row.picture,
         }))
       : [];
   }
@@ -102,6 +105,7 @@ class Recipe extends Database {
         id: recipeData.id,
         title: recipeData.title,
         instructions: recipeData.instructions,
+        picture: recipeData.picture,
       };
 
       return recipe;
@@ -115,10 +119,12 @@ class Recipe extends Database {
     recipeId: number
   ): Promise<Recipe | null> {
     await Database.checkDatabaseConnection();
-    const query = "UPDATE recipes SET title = ?, instructions = ? WHERE id = ?";
+    const query =
+      "UPDATE recipes SET title = ?, instructions = ?, picture = ? WHERE id = ?";
     const [result] = await Recipe.connection.execute<ResultSetHeader>(query, [
       updatedRecipe.title,
       updatedRecipe.instructions,
+      updatedRecipe.picture,
       recipeId,
     ]);
 
