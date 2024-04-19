@@ -1,27 +1,56 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
+import axios from "axios";
 import { Ingredient } from "../../types/ingredient";
 
-const ingredientApi = axios.create({
-  baseURL: "http://localhost:3000/ingredient/",
-});
-
-export const getIngredients = async () => {
-  const response = await ingredientApi.get("/");
-  return response.data;
-};
-
 type IngredientListProps = {
-  ingredients: Ingredient[];
+  search: string;
+  selectedIngredients: Ingredient[];
+  onIngredientSelection: (ingredient: Ingredient) => void;
 };
 
-export default function IngredientList({ ingredients }: IngredientListProps) {
+export default function IngredientList({
+  search,
+  selectedIngredients,
+  onIngredientSelection,
+}: IngredientListProps) {
+  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+
+  useEffect(() => {
+    const fetchIngredients = async () => {
+      try {
+        const response = await axios.get<Ingredient[]>(
+          "http://localhost:3000/ingredient/"
+        );
+        setIngredients(response.data);
+      } catch (error) {
+        console.error("Error fetching ingredients:", error);
+      }
+    };
+
+    fetchIngredients();
+  }, []);
+
+  const handleIngredientSelection = (ingredient: Ingredient) => {
+    if (
+      !selectedIngredients.find((selected) => selected.id === ingredient.id)
+    ) {
+      onIngredientSelection(ingredient);
+    }
+  };
+
+  const filteredIngredients = ingredients.filter((ingredient) =>
+    ingredient.name.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div>
-      {ingredients.map((ingredient: Ingredient) => (
-        <div key={ingredient.id}>
+      {filteredIngredients.map((ingredient) => (
+        <div
+          key={ingredient.id}
+          onClick={() => handleIngredientSelection(ingredient)}
+          style={{ cursor: "pointer" }}
+        >
           {ingredient.name}
-          {ingredient.season === "été" ? "☘️" : undefined}
         </div>
       ))}
     </div>
