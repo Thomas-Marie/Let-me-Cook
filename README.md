@@ -6,6 +6,8 @@ This project marks my first significant experience, driven by a concrete need an
 
 As it is in progress, the readme will be updated progressively. ⏳
 
+the "feature" branch is the only one that is updated regularly.
+
 ## Steps
 
 I followed the methods I learned, beginning with the conception phase, where I initiated the process by outlining **user stories.**
