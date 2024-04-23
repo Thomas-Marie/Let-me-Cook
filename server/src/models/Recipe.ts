@@ -56,38 +56,35 @@ class Recipe extends Database {
     }
   }
 
-  /*
-  une recette est retournée SEULEMENT SI tous les ingrédients associés à la recette sont sélectionnés 
-  sinon ça retourne un array vide
-  */
   static async getRecipesByIngredients(
     ingredientIds: number[]
   ): Promise<RecipeInterface[]> {
     try {
       await Database.checkDatabaseConnection();
-      const allRecipes: RecipeInterface[] = await Recipe.getRecipes();
-      const validRecipes: RecipeInterface[] = [];
 
-      for (const recipe of allRecipes) {
-        const associatedIngredients = await Recipe.getIngredientIdsByRecipeId(
-          recipe.id
-        );
-        const allSelectedIngredientsIncluded = ingredientIds.every(
-          (selectedIngredientId) =>
-            associatedIngredients.includes(selectedIngredientId)
-        );
-        const allAssociatedIngredientsIncluded = associatedIngredients.every(
-          (associatedIngredientId) =>
-            ingredientIds.includes(associatedIngredientId)
-        );
+      const query = `
+              SELECT r.*
+              FROM recipes r 
+              JOIN quantities q ON q.recipe_id  = r.id 
+              JOIN ingredients i ON q.ingredient_id = i.id 
+              WHERE NOT EXISTS (
+                  SELECT 1
+                  FROM quantities q
+                  WHERE q.recipe_id = r.id AND q.ingredient_id NOT IN (${ingredientIds.join(
+                    ", "
+                  )})
+              )
+              GROUP BY r.id
+          `;
 
-        if (
-          allSelectedIngredientsIncluded &&
-          allAssociatedIngredientsIncluded
-        ) {
-          validRecipes.push(recipe);
-        }
-      }
+      const [rows] = await this.connection.execute<RowDataPacket[]>(query);
+
+      const validRecipes: RecipeInterface[] = rows.map((row: any) => ({
+        id: row.id,
+        title: row.title,
+        instructions: row.instructions,
+        picture: row.picture,
+      }));
 
       return validRecipes;
     } catch (error) {
