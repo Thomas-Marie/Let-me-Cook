@@ -1,13 +1,11 @@
 type SearchBarProps = {
   search: string;
   onSearchChange: (newSearch: string) => void;
-  onSearchSubmit: () => void;
 };
 
-export default function SearchBar({ search, onSearchChange, onSearchSubmit }: SearchBarProps) {
+export default function SearchBar({ search, onSearchChange }: SearchBarProps) {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSearchSubmit();
   };
   return (
     <form className='d-flex' onSubmit={handleSubmit}>
