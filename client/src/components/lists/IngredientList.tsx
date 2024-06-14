@@ -8,19 +8,13 @@ type IngredientListProps = {
   onIngredientSelection: (ingredient: Ingredient) => void;
 };
 
-export default function IngredientList({
-  search,
-  selectedIngredients,
-  onIngredientSelection,
-}: IngredientListProps) {
+export default function IngredientList({ search, selectedIngredients, onIngredientSelection }: IngredientListProps) {
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
 
   useEffect(() => {
     const fetchIngredients = async () => {
       try {
-        const response = await axios.get<Ingredient[]>(
-          "http://localhost:3000/ingredient/"
-        );
+        const response = await axios.get<Ingredient[]>("http://localhost:3000/ingredient/");
         setIngredients(response.data);
       } catch (error) {
         console.error("Error fetching ingredients:", error);
@@ -31,25 +25,21 @@ export default function IngredientList({
   }, []);
 
   const handleIngredientSelection = (ingredient: Ingredient) => {
-    if (
-      !selectedIngredients.find((selected) => selected.id === ingredient.id)
-    ) {
+    if (!selectedIngredients.find((selected) => selected.id === ingredient.id)) {
       onIngredientSelection(ingredient);
     }
   };
 
-  const filteredIngredients = ingredients.filter((ingredient) =>
-    ingredient.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredIngredients = ingredients.filter((ingredient) => ingredient.name.toLowerCase().includes(search.toLowerCase()));
 
   return (
     <div>
       {filteredIngredients.map((ingredient) => (
         <div
+          className='d-flex justify-content-center'
           key={ingredient.id}
           onClick={() => handleIngredientSelection(ingredient)}
-          style={{ cursor: "pointer" }}
-        >
+          style={{ cursor: "pointer" }}>
           {ingredient.name}
         </div>
       ))}

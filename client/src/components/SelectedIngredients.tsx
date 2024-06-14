@@ -6,10 +6,7 @@ type SelectedIngredientsProps = {
   onIngredientRemove: (ingredient: Ingredient) => void;
 };
 
-export default function SelectedIngredients({
-  ingredients,
-  onIngredientRemove,
-}: SelectedIngredientsProps) {
+export default function SelectedIngredients({ ingredients, onIngredientRemove }: SelectedIngredientsProps) {
   const handleIngredientRemove = (ingredient: Ingredient) => {
     onIngredientRemove(ingredient);
   };
@@ -20,10 +17,7 @@ export default function SelectedIngredients({
       {ingredients.map((ingredient, index) => (
         <div key={index}>
           {ingredient.name}
-          <FaTrash
-            onClick={() => handleIngredientRemove(ingredient)}
-            style={{ cursor: "pointer" }}
-          />
+          <FaTrash onClick={() => handleIngredientRemove(ingredient)} style={{ cursor: "pointer" }} />
         </div>
       ))}
     </div>

@@ -6,51 +6,34 @@ import IngredientList from "../components/lists/IngredientList";
 import SearchBar from "../components/SeachBar";
 import SelectedIngredients from "../components/SelectedIngredients";
 import RecipeFetcher from "../components/RecipeFetcher";
+import NavBar from "../components/Navbar";
 
 function App() {
   const [search, setSearch] = useState<string>("");
-  const [selectedIngredients, setSelectedIngredients] = useState<Ingredient[]>(
-    []
-  );
+  const [selectedIngredients, setSelectedIngredients] = useState<Ingredient[]>([]);
 
   const handleIngredientSelection = (ingredient: Ingredient) => {
-    setSelectedIngredients((prevIngredients) => [
-      ...prevIngredients,
-      ingredient,
-    ]);
+    setSelectedIngredients((prevIngredients) => [...prevIngredients, ingredient]);
   };
 
   const handleIngredientRemove = (ingredient: Ingredient) => {
-    setSelectedIngredients((prevIngredients) =>
-      prevIngredients.filter((item) => item !== ingredient)
-    );
+    setSelectedIngredients((prevIngredients) => prevIngredients.filter((item) => item !== ingredient));
   };
 
   return (
-    <Container>
+    <div>
+      <NavBar />
       <Row>
-        <Col md={6}>
+        <Col md={4}>
           <SearchBar search={search} onSearchChange={setSearch} />
-          <IngredientList
-            search={search}
-            selectedIngredients={selectedIngredients}
-            onIngredientSelection={handleIngredientSelection}
-          />
+          <IngredientList search={search} selectedIngredients={selectedIngredients} onIngredientSelection={handleIngredientSelection} />
         </Col>
-        <Col md={6}>
-          <SelectedIngredients
-            ingredients={selectedIngredients}
-            onIngredientRemove={handleIngredientRemove}
-          />
-          <RecipeFetcher
-            selectedIngredients={selectedIngredients.map(
-              (ingredient) => ingredient.id
-            )}
-            onIngredientRemove={handleIngredientRemove}
-          />
+        <Col md={4}>
+          <SelectedIngredients ingredients={selectedIngredients} onIngredientRemove={handleIngredientRemove} />
+          <RecipeFetcher selectedIngredients={selectedIngredients.map((ingredient) => ingredient.id)} onIngredientRemove={handleIngredientRemove} />
         </Col>
       </Row>
-    </Container>
+    </div>
   );
 }
 
